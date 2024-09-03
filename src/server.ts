@@ -84,8 +84,13 @@ function authErrorHandler(app: Application): void {
     log.log('error', `AuthService ${error.comingFrom}:`, error); 
 
     if (error instanceof CustomeError) { 
-      console.log('11111111111111111111111111111111111111111111111111111');
+      console.log('1111111111111111111111');
       res.status(error.statusCode).json(error.serializeErrors());
+    }
+
+    if (error instanceof Error) { 
+      console.log('333333333333333333333');
+      res.status(500).json(error);
     }
 
     next();

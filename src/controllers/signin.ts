@@ -6,7 +6,7 @@ import { getUserByEmail, getUserByUsername, signToken, updateUserOTP } from '@au
 import { BadRequestError, IAuthDocument, IEmailMessageDetails, isEmail } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { omit } from 'lodash';
+import { pick } from 'lodash';
 import { publishDirectMessage } from '@auth/queues/auth.producer';
 import { authChannel } from '@auth/server';
 
@@ -32,7 +32,8 @@ export async function read(req: Request, res: Response): Promise<void> {
   }
 
   let userJWT = '';
-  let userData: IAuthDocument | null = null;
+  // let userData: IAuthDocument | null = null;
+  let userData;
   let message = 'User login successfully';
   let userBrowserName = '';
   let userDeviceType = '';
@@ -67,8 +68,9 @@ export async function read(req: Request, res: Response): Promise<void> {
     await updateUserOTP(existingUser.id!, `${otpCode}`, date, '', '');
   } else {
     userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!);
-    userData = omit(existingUser, ['password']);
+    // userData = omit(existingUser, ['password']);
+    userData = pick(existingUser, ['username']);
   }
   //  the below userJWT will be send back to used as cookie. not in json body response
-  res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType });
+  res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType, mytoken:userJWT });
 }

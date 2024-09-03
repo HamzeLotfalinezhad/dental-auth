@@ -14,12 +14,13 @@ import { StatusCodes } from 'http-status-codes';
 
 export async function create(req: Request, res: Response): Promise<void> {
   const { error } = await Promise.resolve(signupSchema.validate(req.body));
-
   if (error?.details) {
+    console.log('ssssssssssssssssssssssssssssssssssssssssssssssss')
     throw new BadRequestError(error.details[0].message, 'SignUp create() method error');
   }
   const { username, email, password, country, browserName, deviceType } = req.body;
 
+  
   // check if user already exist
   const checkIfUserExist: IAuthDocument | undefined = await getUserByUsernameOrEmail(username, email);
   if (checkIfUserExist) {
@@ -58,7 +59,6 @@ export async function create(req: Request, res: Response): Promise<void> {
   } as IAuthDocument;
   const result: IAuthDocument = await createAuthUser(authData) as IAuthDocument;
 
-  // if(!result) 
   // send verification email to notification service with rabbitmq
   // const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=${authData.emailVerificationToken}`;
   // const messageDetails: IEmailMessageDetails = {
@@ -73,7 +73,9 @@ export async function create(req: Request, res: Response): Promise<void> {
   //   JSON.stringify(messageDetails),
   //   'Verify email message has been sent to notification service.'
   // );
+  
   const userJWT: string = signToken(result.id!, result.email!, result.username!);
-  res.status(StatusCodes.CREATED).json({ message: 'User created successfully', user: result, token: userJWT });
+  console.log(userJWT)
+  res.status(StatusCodes.CREATED).json({ message: 'User created successfully', token: userJWT });
 
 }
