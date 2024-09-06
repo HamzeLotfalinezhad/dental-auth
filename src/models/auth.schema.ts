@@ -3,6 +3,8 @@ import { IAuthDocument } from '@hamzelotfalinezhad/shared-library';
 import { compare, hash } from 'bcryptjs';
 import { DataTypes, Model, ModelDefined, Optional } from 'sequelize';
 
+// TODO remove profilePicture from auth db
+
 const SALT_ROUND = 10;
 
 // using an interface for adding custom methods to a Sequelize model. 

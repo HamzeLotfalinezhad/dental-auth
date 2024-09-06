@@ -18,6 +18,7 @@ export async function read(req: Request, res: Response): Promise<void> {
 
   const { username, password, browserName, deviceType } = req.body;
   const isValidEmail: boolean = isEmail(username);
+  console.log('validddddddddddddddddddddddddd', isValidEmail)
 
   // check if user exist
   const existingUser: IAuthDocument | undefined = !isValidEmail ? await getUserByUsername(username) : await getUserByEmail(username);
@@ -38,17 +39,17 @@ export async function read(req: Request, res: Response): Promise<void> {
   let userBrowserName = '';
   let userDeviceType = '';
 
-  const USE_OTP = false; // make this true if you want OTP enabled
+  const USE_OTP = true; // make this true if you want OTP enabled
 
   // if user coming from different browser the send OTP email to verify
   if (USE_OTP && (browserName !== existingUser.browserName || deviceType !== existingUser.deviceType)) {
-
+console.log('OTP')
     // min 6 digits and max 6 digits
     const otpCode = randomInt(10 ** 5, 10 ** 6 - 1);
 
     // send email with otp
     const messageDetails: IEmailMessageDetails = {
-      receiverEmail: existingUser.email,
+      receiverEmail: 'hamze.t633@gmail.com', //existingUser.email,
       username: existingUser.username,
       otp: `${otpCode}`,
       template: 'otpEmail'
@@ -69,7 +70,7 @@ export async function read(req: Request, res: Response): Promise<void> {
   } else {
     userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!);
     // userData = omit(existingUser, ['password']);
-    userData = pick(existingUser, ['username']);
+    userData = pick(existingUser, ['username', 'id']);
   }
   
   res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType });

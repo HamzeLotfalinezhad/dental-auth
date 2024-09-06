@@ -2,13 +2,13 @@ import crypto from 'crypto';
 
 import { signupSchema } from '@auth/schemes/signup';
 import { createAuthUser, getUserByUsernameOrEmail, signToken } from '@auth/services/auth.service';
-import { BadRequestError, IAuthDocument, firstLetterUppercase, lowerCase } from '@hamzelotfalinezhad/shared-library';
+import { BadRequestError, IAuthDocument, IEmailMessageDetails, firstLetterUppercase, lowerCase } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { v4 as uuidV4 } from 'uuid';
 // import { UploadApiResponse } from 'cloudinary';
-// import { config } from '@auth/config';
-// import { publishDirectMessage } from '@auth/queues/auth.producer';
-// import { authChannel } from '@auth/server';
+import { config } from '@auth/config';
+import { publishDirectMessage } from '@auth/queues/auth.producer';
+import { authChannel } from '@auth/server';
 import { StatusCodes } from 'http-status-codes';
 // import { BadRequestError } from './error-handler';
 
@@ -58,23 +58,23 @@ export async function create(req: Request, res: Response): Promise<void> {
   } as IAuthDocument;
   const result: IAuthDocument = await createAuthUser(authData) as IAuthDocument;
 
+  // TODO  remove my gmail
+  
   // send verification email to notification service with rabbitmq
-  // const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=${authData.emailVerificationToken}`;
-  // const messageDetails: IEmailMessageDetails = {
-  //   receiverEmail: result.email,
-  //   verifyLink: verificationLink,
-  //   template: 'verifyEmail'
-  // };
-  // await publishDirectMessage(
-  //   authChannel,
-  //   'dental-email-notification',
-  //   'auth-email',
-  //   JSON.stringify(messageDetails),
-  //   'Verify email message has been sent to notification service.'
-  // );
+  const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=${authData.emailVerificationToken}`;
+  const messageDetails: IEmailMessageDetails = {
+    receiverEmail: "hamze.t633@gmail.com",//result.email,
+    verifyLink: verificationLink,
+    template: 'verifyEmail'
+  };
+  await publishDirectMessage(
+    authChannel,
+    'dental-email-notification',
+    'auth-email',
+    JSON.stringify(messageDetails),
+    'Verify email message has been sent to notification service.'
+  );
   
   const userJWT: string = signToken(result.id!, result.email!, result.username!);
-  console.log(userJWT)
   res.status(StatusCodes.CREATED).json({ message: 'User created successfully', token: userJWT });
-
 }

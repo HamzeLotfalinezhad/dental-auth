@@ -2,7 +2,7 @@ import { getAuthUserByOTP, signToken, updateUserOTP } from '@auth/services/auth.
 import { BadRequestError, IAuthDocument } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
-import { omit } from 'lodash';
+import { pick } from 'lodash';
 
 export async function updateOTP(req: Request, res: Response): Promise<void> {
   const { otp } = req.params;
@@ -13,6 +13,7 @@ export async function updateOTP(req: Request, res: Response): Promise<void> {
   }
   await updateUserOTP(checkIfUserExist.id!, '', new Date(), browserName, deviceType);
   const userJWT = signToken(checkIfUserExist.id!, checkIfUserExist.email!, checkIfUserExist.username!);
-  const userData = omit(checkIfUserExist, ['password']);
+  // const userData = omit(checkIfUserExist, ['password']);
+  const userData = pick(checkIfUserExist, ['username', 'id']);
   res.status(StatusCodes.OK).json({ message: 'OTP verified successfully.', user: userData, token: userJWT });
 }

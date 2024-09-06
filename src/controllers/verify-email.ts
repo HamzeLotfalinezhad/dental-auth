@@ -2,6 +2,7 @@ import { getAuthUserById, getAuthUserByVerificationToken, updateVerifyEmailField
 import { BadRequestError, IAuthDocument } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
+import { pick } from 'lodash';
 
 export async function update(req: Request, res: Response): Promise<void> {
   const { token } = req.body;
@@ -11,5 +12,6 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
   await updateVerifyEmailField(checkIfUserExist.id!, 1);
   const updatedUser = await getAuthUserById(checkIfUserExist.id!);
-  res.status(StatusCodes.OK).json({ message: 'Email verified successfully.', user: updatedUser });
+  const userData = pick(updatedUser, ['username', 'id']);
+  res.status(StatusCodes.OK).json({ message: 'Email verified successfully.', user: userData });
 }
