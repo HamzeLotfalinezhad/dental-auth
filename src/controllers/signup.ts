@@ -15,7 +15,6 @@ import { StatusCodes } from 'http-status-codes';
 export async function create(req: Request, res: Response): Promise<void> {
   const { error } = await Promise.resolve(signupSchema.validate(req.body));
   if (error?.details) {
-    console.log('ssssssssssssssssssssssssssssssssssssssssssssssss')
     throw new BadRequestError(error.details[0].message, 'SignUp create() method error');
   }
   const { username, email, password, country, browserName, deviceType } = req.body;

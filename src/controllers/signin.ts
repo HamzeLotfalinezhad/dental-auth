@@ -71,6 +71,6 @@ export async function read(req: Request, res: Response): Promise<void> {
     // userData = omit(existingUser, ['password']);
     userData = pick(existingUser, ['username']);
   }
-  //  the below userJWT will be send back to used as cookie. not in json body response
-  res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType, mytoken:userJWT });
+  
+  res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType });
 }

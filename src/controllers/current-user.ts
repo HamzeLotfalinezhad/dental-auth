@@ -7,6 +7,7 @@ import { StatusCodes } from 'http-status-codes';
 import { config } from '@auth/config';
 import { publishDirectMessage } from '@auth/queues/auth.producer';
 import { authChannel } from '@auth/server';
+import { pick } from 'lodash';
 
 export async function read(req: Request, res: Response): Promise<void> {
   let user = null;
@@ -14,6 +15,7 @@ export async function read(req: Request, res: Response): Promise<void> {
   if (Object.keys(existingUser!).length) {
     user = existingUser;
   }
+  user = pick(existingUser, ['username']);
   res.status(StatusCodes.OK).json({ message: 'Authenticated user', user });
 }
 
