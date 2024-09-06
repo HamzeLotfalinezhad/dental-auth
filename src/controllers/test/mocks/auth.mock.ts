@@ -40,7 +40,7 @@ export const authMock: IAuthDocument = {
   username: 'Manny',
   email: 'manny@test.com',
   country: 'Brazil',
-  profilePicture: '',
+  role: 'user',
   emailVerified: 1,
   createdAt: '2023-12-19T07:42:24.431Z',
   comparePassword: () => {},

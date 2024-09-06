@@ -21,7 +21,7 @@ export async function createAuthUser(data: IAuthDocument): Promise<IAuthDocument
     const messageDetails: IAuthBuyerMessageDetails = {
       username: result.dataValues.username!,
       email: result.dataValues.email!,
-      profilePicture: result.dataValues.profilePicture!,
+      role: result.dataValues.role!,
       country: result.dataValues.country!,
       createdAt: result.dataValues.createdAt!,
       type: 'auth'
@@ -192,12 +192,13 @@ export async function updateUserOTP(authId: number, otp: string, otpExpiration: 
   }
 }
 
-export function signToken(id: number, email: string, username: string): string {
+export function signToken(id: number, email: string, username: string, role: String): string {
   return sign(
     {
       id,
       email,
-      username
+      username,
+      role
     },
     config.JWT_TOKEN!
   );

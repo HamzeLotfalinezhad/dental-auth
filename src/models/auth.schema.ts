@@ -45,9 +45,10 @@ const AuthModel: ModelDefined<IAuthDocument, AuthUserCreationAttributes> & AuthM
     type: DataTypes.STRING,
     allowNull: false
   },
-  profilePicture: {
+  role: {
     type: DataTypes.STRING,
-    allowNull: false
+    allowNull: false,
+    defaultValue: "user"
   },
   emailVerificationToken: {
     type: DataTypes.STRING,

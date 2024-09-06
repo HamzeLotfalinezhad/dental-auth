@@ -15,7 +15,7 @@ export async function read(req: Request, res: Response): Promise<void> {
   if (Object.keys(existingUser!).length) {
     user = existingUser;
   }
-  user = pick(existingUser, ['username']);
+  user = pick(existingUser, ['username', 'id']);
   res.status(StatusCodes.OK).json({ message: 'Authenticated user', user });
 }
 

@@ -23,7 +23,8 @@ export async function create(req: Request, res: Response): Promise<void> {
     const email = faker.internet.email();
     const password = 'qwerty';
     const country = faker.location.country();
-    const profilePicture = faker.image.urlPicsumPhotos();
+    // const profilePicture = faker.image.urlPicsumPhotos();
+    const role = "user";
     const browserName = 'googleChrome';
     const checkIfUserExist: IAuthDocument | undefined = await getUserByUsernameOrEmail(username, email);
 
@@ -40,7 +41,7 @@ export async function create(req: Request, res: Response): Promise<void> {
       profilePublicId,
       password,
       country,
-      profilePicture,
+      role,
       emailVerificationToken: randomCharacters,
       emailVerified: sample([0, 1]),
       browserName: browserName,

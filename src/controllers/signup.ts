@@ -19,17 +19,10 @@ export async function create(req: Request, res: Response): Promise<void> {
   }
   const { username, email, password, country, browserName, deviceType } = req.body;
 
-  
   // check if user already exist
   const checkIfUserExist: IAuthDocument | undefined = await getUserByUsernameOrEmail(username, email);
   if (checkIfUserExist) {
-    // res.status(StatusCodes.CONFLICT).json({ message: 'Email or Username Exists' });
-    // try {
     throw new BadRequestError('Invalid credentials. Email or Username Exists', 'SignUp create() method error');
-    // } catch (error) {
-    // console.log('Is instance of CustomeError:', error instanceof CustomeError); // Should be true
-    // console.log('Error:', error); // Logs the error details
-    // }
   }
 
   // uplodad profile image to cloudinary
@@ -50,8 +43,7 @@ export async function create(req: Request, res: Response): Promise<void> {
     profilePublicId,
     password,
     country,
-    // profilePicture: uploadResult?.secure_url,
-    profilePicture: 'uploadResult?.secure_url',
+    role: 'user',
     emailVerificationToken: randomCharacters,
     browserName,
     deviceType
@@ -59,7 +51,7 @@ export async function create(req: Request, res: Response): Promise<void> {
   const result: IAuthDocument = await createAuthUser(authData) as IAuthDocument;
 
   // TODO  remove my gmail
-  
+
   // send verification email to notification service with rabbitmq
   const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=${authData.emailVerificationToken}`;
   const messageDetails: IEmailMessageDetails = {
@@ -74,7 +66,9 @@ export async function create(req: Request, res: Response): Promise<void> {
     JSON.stringify(messageDetails),
     'Verify email message has been sent to notification service.'
   );
-  
-  const userJWT: string = signToken(result.id!, result.email!, result.username!);
+
+  const userJWT: string = signToken(result.id!, result.email!, result.username!, result.role!);
+
+  // The token: userJWT will set to header as a cookie when returns to gateway-service and will not show to user in response object 
   res.status(StatusCodes.CREATED).json({ message: 'User created successfully', token: userJWT });
 }

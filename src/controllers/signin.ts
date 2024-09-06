@@ -43,7 +43,7 @@ export async function read(req: Request, res: Response): Promise<void> {
 
   // if user coming from different browser the send OTP email to verify
   if (USE_OTP && (browserName !== existingUser.browserName || deviceType !== existingUser.deviceType)) {
-console.log('OTP')
+
     // min 6 digits and max 6 digits
     const otpCode = randomInt(10 ** 5, 10 ** 6 - 1);
 
@@ -68,10 +68,10 @@ console.log('OTP')
     date.setMinutes(date.getMinutes() + 10);
     await updateUserOTP(existingUser.id!, `${otpCode}`, date, '', '');
   } else {
-    userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!);
+    userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!, existingUser.role!);
     // userData = omit(existingUser, ['password']);
     userData = pick(existingUser, ['username', 'id']);
   }
-  
+
   res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType });
 }

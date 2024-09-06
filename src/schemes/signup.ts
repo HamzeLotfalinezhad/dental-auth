@@ -22,11 +22,6 @@ const signupSchema: ObjectSchema = Joi.object().keys({
     'string.email': 'Invalid email',
     'string.empty': 'Email is a required field'
   }),
-  // profilePicture: Joi.string().required().messages({
-  //   'string.base': 'Please add a profile picture',
-  //   'string.email': 'Profile picture is required',
-  //   'string.empty': 'Profile picture is required'
-  // }),
   browserName: Joi.string().optional(),
   deviceType: Joi.string().optional()
 });
