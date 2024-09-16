@@ -19,6 +19,7 @@ export async function createAuthUser(data: IAuthDocument): Promise<IAuthDocument
 
     // also send this new user to users-service mongodb as a buyer (each created user is also a buyer by default)
     const messageDetails: IAuthBuyerMessageDetails = {
+      authId: result.dataValues.id,
       username: result.dataValues.username!,
       email: result.dataValues.email!,
       role: result.dataValues.role!,
@@ -202,4 +203,17 @@ export function signToken(id: number, email: string, username: string, role: Str
     },
     config.JWT_TOKEN!
   );
+}
+
+export async function updateRole(id: Number, email: string, role: String): Promise<void> {
+  try {
+    await AuthModel.update(
+      {
+        role,
+      },
+      { where: { id: id, email: email } }
+    );
+  } catch (error) {
+    log.error(error);
+  }
 }

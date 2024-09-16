@@ -18,7 +18,6 @@ export async function read(req: Request, res: Response): Promise<void> {
 
   const { username, password, browserName, deviceType } = req.body;
   const isValidEmail: boolean = isEmail(username);
-  console.log('validddddddddddddddddddddddddd', isValidEmail)
 
   // check if user exist
   const existingUser: IAuthDocument | undefined = !isValidEmail ? await getUserByUsername(username) : await getUserByEmail(username);
