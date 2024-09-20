@@ -16,7 +16,7 @@ import { Channel } from 'amqplib';
 import { createConnection } from '@auth/queues/connection';
 // import { CustomeError } from './controllers/error-handler';
 
-const SERVER_PORT = 4002;
+const SERVER_PORT = 4003;
 const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'authenticationServer', 'debug');
 
 export let authChannel: Channel;
