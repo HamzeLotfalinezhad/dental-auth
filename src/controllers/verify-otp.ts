@@ -14,6 +14,6 @@ export async function updateOTP(req: Request, res: Response): Promise<void> {
   await updateUserOTP(checkIfUserExist.id!, '', new Date(), browserName, deviceType);
   const userJWT = signToken(checkIfUserExist.id!, checkIfUserExist.email!, checkIfUserExist.username!, checkIfUserExist.role!);
   // const userData = omit(checkIfUserExist, ['password']);
-  const userData = pick(checkIfUserExist, ['username', 'id']);
+  const userData = pick(checkIfUserExist, ['username', 'id', 'email']);
   res.status(StatusCodes.OK).json({ message: 'OTP verified successfully.', user: userData, token: userJWT });
 }

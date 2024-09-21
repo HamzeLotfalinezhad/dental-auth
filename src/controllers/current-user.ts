@@ -42,7 +42,8 @@ export async function resendEmail(req: Request, res: Response): Promise<void> {
     'Verify email message has been sent to notification service.'
   );
   const updatedUser = await getAuthUserById(parseInt(userId));
-  res.status(StatusCodes.OK).json({ message: 'Email verification sent', user: updatedUser });
+  const userData = pick(updatedUser, ['username', 'id', 'email']);
+  res.status(StatusCodes.OK).json({ message: 'Email verification sent', user: userData });
 }
 
 export async function changeRole(req: Request, res: Response): Promise<void> {
