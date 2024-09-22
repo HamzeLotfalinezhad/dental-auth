@@ -67,9 +67,9 @@ export async function read(req: Request, res: Response): Promise<void> {
     date.setMinutes(date.getMinutes() + 10);
     await updateUserOTP(existingUser.id!, `${otpCode}`, date, '', '');
   } else {
-    userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!, existingUser.role!);
+    userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!, existingUser.name!, existingUser.role!);
     // userData = omit(existingUser, ['password']);
-    userData = pick(existingUser, ['username', 'id']);
+    userData = pick(existingUser, ['username', 'id', 'name', 'email']);
   }
 
   res.status(StatusCodes.OK).json({ message, user: userData, token: userJWT, browserName: userBrowserName, deviceType: userDeviceType });

@@ -25,7 +25,15 @@ type AuthUserCreationAttributes = Optional<IAuthDocument, 'id' | 'createdAt' | '
 // IAuthDocument: The type representing the structure of a record in this model. It defines the properties that exist on each instance of the model (i.e., the fields stored in the database).
 // AuthUserCreationAttributes: The type representing the attributes required when creating a new instance of the model. It specifies which fields are optional or required during creation.
 const AuthModel: ModelDefined<IAuthDocument, AuthUserCreationAttributes> & AuthModelInstanceMethods = sequelize.define('auths', {
+  name: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
   username: {
+    type: DataTypes.STRING,
+    allowNull: false
+  },
+  email: {
     type: DataTypes.STRING,
     allowNull: false
   },
@@ -34,10 +42,6 @@ const AuthModel: ModelDefined<IAuthDocument, AuthUserCreationAttributes> & AuthM
     allowNull: false
   },
   profilePublicId: {
-    type: DataTypes.STRING,
-    allowNull: false
-  },
-  email: {
     type: DataTypes.STRING,
     allowNull: false
   },

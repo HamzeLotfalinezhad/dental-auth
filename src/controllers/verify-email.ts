@@ -12,6 +12,6 @@ export async function update(req: Request, res: Response): Promise<void> {
   }
   await updateVerifyEmailField(checkIfUserExist.id!, 1);
   const updatedUser = await getAuthUserById(checkIfUserExist.id!);
-  const userData = pick(updatedUser, ['username', 'id']);
+  const userData = pick(updatedUser, ['username', 'id', 'email', 'name']);
   res.status(StatusCodes.OK).json({ message: 'Email verified successfully.', user: userData });
 }

@@ -20,7 +20,7 @@
   "dependencies": {
     "@elastic/elasticsearch": "^8.14.0",
     "@faker-js/faker": "^8.4.1",
-    "@hamzelotfalinezhad/shared-library": "npm:@HamzeLotfalinezhad/shared-library@^0.0.15",
+    "@hamzelotfalinezhad/shared-library": "npm:@HamzeLotfalinezhad/shared-library@^0.0.19",
     "amqplib": "^0.10.4",
     "bcryptjs": "^2.4.3",
     "cloudinary": "^2.2.0",

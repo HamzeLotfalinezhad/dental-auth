@@ -1,8 +1,6 @@
 import { config } from '@auth/config';
 import { AuthModel } from '@auth/models/auth.schema';
-import { publishDirectMessage } from '@auth/queues/auth.producer';
-import { authChannel } from '@auth/server';
-import { IAuthBuyerMessageDetails, IAuthDocument, firstLetterUppercase, lowerCase, winstonLogger } from '@hamzelotfalinezhad/shared-library';
+import { IAuthDocument, firstLetterUppercase, lowerCase, winstonLogger } from '@hamzelotfalinezhad/shared-library';
 import { sign } from 'jsonwebtoken';
 import { omit } from 'lodash';
 import { Model, Op } from 'sequelize';
@@ -14,29 +12,8 @@ const log: Logger = winstonLogger(`${config.ELASTIC_SEARCH_URL}`, 'authService',
 // or that there is a scenario where an IAuthDocument is not available or cannot be created. For example:
 export async function createAuthUser(data: IAuthDocument): Promise<IAuthDocument | undefined> {
   try {
-    // create user - add to db
     const result: Model = await AuthModel.create(data);
-
-    // also send this new user to users-service mongodb as a buyer (each created user is also a buyer by default)
-    const messageDetails: IAuthBuyerMessageDetails = {
-      authId: result.dataValues.id,
-      username: result.dataValues.username!,
-      email: result.dataValues.email!,
-      role: result.dataValues.role!,
-      country: result.dataValues.country!,
-      createdAt: result.dataValues.createdAt!,
-      type: 'auth'
-    };
-    await publishDirectMessage(
-      authChannel,
-      'dental-buyer-update',
-      'user-buyer',
-      JSON.stringify(messageDetails),
-      'Buyer details sent to buyer service.'
-    );
-
     const userData: IAuthDocument = omit(result.dataValues, ['password']) as IAuthDocument;
-
     return userData;
   } catch (error) {
     log.error(error);
@@ -193,12 +170,13 @@ export async function updateUserOTP(authId: number, otp: string, otpExpiration: 
   }
 }
 
-export function signToken(id: number, email: string, username: string, role: String): string {
+export function signToken(id: number, email: string, username: string, name: string, role: String): string {
   return sign(
     {
       id,
       email,
       username,
+      name,
       role
     },
     config.JWT_TOKEN!
