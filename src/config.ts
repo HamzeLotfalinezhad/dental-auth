@@ -18,6 +18,7 @@ if (process.env.ENABLE_APM === '1') {
 }
 
 class Config {
+  public DATABASE_URL: string | undefined;
   public NODE_ENV: string | undefined;
   public RABBITMQ_ENDPOINT: string | undefined;
   public MYSQL_DB: string | undefined;
@@ -31,6 +32,7 @@ class Config {
   public ELASTIC_SEARCH_URL: string | undefined;
 
   constructor() {
+    this.DATABASE_URL = process.env.DATABASE_URL || '';
     this.NODE_ENV = process.env.NODE_ENV || '';
     this.JWT_TOKEN = process.env.JWT_TOKEN || '';
     this.GATEWAY_JWT_TOKEN = process.env.GATEWAY_JWT_TOKEN || '';

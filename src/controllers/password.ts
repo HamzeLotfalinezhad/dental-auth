@@ -1,14 +1,13 @@
 import crypto from 'crypto';
 
 import { emailSchema, passwordSchema } from '@auth/schemes/password';
-import { getAuthUserByPasswordToken, getUserByEmail, updatePassword, updatePasswordToken } from '@auth/services/auth.service';
+import { getAuthUserByPasswordToken, getUserByEmail, hashPassword, updatePassword, updatePasswordToken } from '@auth/services/auth.service';
 import { BadRequestError, IAuthDocument, IEmailMessageDetails } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { config } from '@auth/config';
 import { publishDirectMessage } from '@auth/queues/auth.producer';
 import { authChannel } from '@auth/server';
 import { StatusCodes } from 'http-status-codes';
-import { AuthModel } from '@auth/models/auth.schema';
 
 export async function forgotPassword(req: Request, res: Response): Promise<void> {
   const { email } = req.body;
@@ -16,7 +15,7 @@ export async function forgotPassword(req: Request, res: Response): Promise<void>
   if (error?.details) {
     throw new BadRequestError(error.details[0].message, 'Password forgotPassword() method error');
   }
-  const existingUser: IAuthDocument | undefined = await getUserByEmail(email);
+  const existingUser: IAuthDocument | null = await getUserByEmail(email);
   if (!existingUser) {
     throw new BadRequestError('Invalid credentials', 'Password forgotPassword() method error');
   }
@@ -24,12 +23,12 @@ export async function forgotPassword(req: Request, res: Response): Promise<void>
   const randomCharacters: string = randomBytes.toString('hex');
   const date: Date = new Date();
   date.setHours(date.getHours() + 1);
-  await updatePasswordToken(existingUser.id!, randomCharacters, date);
+  await updatePasswordToken(existingUser._id!, randomCharacters, date);
   const resetLink = `${config.CLIENT_URL}/reset_password?token=${randomCharacters}`;
   const messageDetails: IEmailMessageDetails = {
     receiverEmail: existingUser.email,
     resetLink,
-    username: existingUser.name, // this is for Hi username in email
+    name: existingUser.name, // this is for Hi username in email
     template: 'forgotPassword'
   };
   await publishDirectMessage(
@@ -53,14 +52,17 @@ export async function resetPassword(req: Request, res: Response): Promise<void> 
     throw new BadRequestError('Passwords do not match', 'Password resetPassword() method error');
   }
 
-  const existingUser: IAuthDocument | undefined = await getAuthUserByPasswordToken(token);
+  const existingUser: IAuthDocument | null = await getAuthUserByPasswordToken(token);
   if (!existingUser) {
     throw new BadRequestError('Reset token has expired', 'Password resetPassword() method error');
   }
-  const hashedPassword: string = await AuthModel.prototype.hashPassword(password);
-  await updatePassword(existingUser.id!, hashedPassword);
+  // const hashedPassword: string = await AuthModel.prototype.hashPassword(password);
+  const hashedPassword = await hashPassword(password);
+  if (!hashedPassword) throw new BadRequestError('Error hashing password', 'Password resetPassword() method error');
+  
+  await updatePassword(existingUser._id!, hashedPassword);
   const messageDetails: IEmailMessageDetails = {
-    username: existingUser.username,
+    username: existingUser.name,
     template: 'resetPasswordSuccess'
   };
   await publishDirectMessage(

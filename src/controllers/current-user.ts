@@ -11,7 +11,7 @@ import { pick } from 'lodash';
 
 export async function read(req: Request, res: Response): Promise<void> {
   let user = null;
-  const existingUser: IAuthDocument | undefined = await getAuthUserById(req.currentUser!.id);
+  const existingUser: IAuthDocument | null = await getAuthUserById(req.currentUser!.id);
   if (Object.keys(existingUser!).length) {
     user = existingUser;
   }
@@ -21,14 +21,14 @@ export async function read(req: Request, res: Response): Promise<void> {
 
 export async function resendEmail(req: Request, res: Response): Promise<void> {
   const { email, userId } = req.body;
-  const checkIfUserExist: IAuthDocument | undefined = await getUserByEmail(lowerCase(email));
+  const checkIfUserExist: IAuthDocument | null = await getUserByEmail(lowerCase(email));
   if (!checkIfUserExist) {
     throw new BadRequestError('Email is invalid', 'CurrentUser resentEmail() method error');
   }
   const randomBytes: Buffer = await Promise.resolve(crypto.randomBytes(20));
   const randomCharacters: string = randomBytes.toString('hex');
   const verificationLink = `${config.CLIENT_URL}/confirm_email?v_token=${randomCharacters}`;
-  await updateVerifyEmailField(parseInt(userId), 0, randomCharacters);
+  await updateVerifyEmailField(userId, 0, randomCharacters);
   const messageDetails: IEmailMessageDetails = {
     receiverEmail: lowerCase(email),
     verifyLink: verificationLink,
@@ -41,7 +41,7 @@ export async function resendEmail(req: Request, res: Response): Promise<void> {
     JSON.stringify(messageDetails),
     'Verify email message has been sent to notification service.'
   );
-  const updatedUser = await getAuthUserById(parseInt(userId));
+  const updatedUser = await getAuthUserById(userId);
   const userData = pick(updatedUser, ['username', 'id', 'email']);
   res.status(StatusCodes.OK).json({ message: 'Email verification sent', user: userData });
 }
@@ -51,7 +51,7 @@ export async function changeRole(req: Request, res: Response): Promise<void> {
   await updateRole(Number(req.body.id), req.body.email, req.body.role);
 
   let user = null;
-  const existingUser: IAuthDocument | undefined = await getAuthUserById(req.body.id);
+  const existingUser: IAuthDocument | null = await getAuthUserById(req.body.id);
   if (Object.keys(existingUser!).length) {
     user = existingUser;
   }
@@ -61,7 +61,7 @@ export async function changeRole(req: Request, res: Response): Promise<void> {
   // const userJWT: string = signToken(user.id!, user.email!, user.username!, user.role!);
 
   const messageDetails = {
-    authId: user.id,
+    id: user._id,
     email: user.email!,
     role: user.role,
     type: 'role'

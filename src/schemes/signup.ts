@@ -19,10 +19,16 @@ const signupSchema: ObjectSchema = Joi.object().keys({
     'string.max': 'Invalid password',
     'string.empty': 'Password is a required field'
   }),
-  country: Joi.string().required().messages({
-    'string.base': 'Country must be of type string',
-    'string.empty': 'Country is a required field'
+  confirmPassword: Joi.string().min(4).max(12).required().messages({
+    'string.base': 'Password Repeat must be of type string',
+    'string.min': 'Invalid Password Repeat',
+    'string.max': 'Invalid Password Repeat',
+    'string.empty': 'Password Repeat is a required field'
   }),
+  // country: Joi.string().required().messages({
+  //   'string.base': 'Country must be of type string',
+  //   'string.empty': 'Country is a required field'
+  // }),
   browserName: Joi.string().optional(),
   deviceType: Joi.string().optional()
 });

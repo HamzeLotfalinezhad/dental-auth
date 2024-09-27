@@ -1,6 +1,6 @@
 import crypto from 'crypto';
 
-import { createAuthUser, getUserByUsernameOrEmail } from '@auth/services/auth.service';
+import { createAuthUser, getUserByEmail } from '@auth/services/auth.service';
 import { faker } from '@faker-js/faker';
 import { BadRequestError, IAuthDocument, firstLetterUppercase, lowerCase } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
@@ -22,11 +22,11 @@ export async function create(req: Request, res: Response): Promise<void> {
     const username = usernames[i];
     const email = faker.internet.email();
     const password = 'qwerty';
-    const country = faker.location.country();
+    // const country = faker.location.country();
     // const profilePicture = faker.image.urlPicsumPhotos();
     const role = "user";
     const browserName = 'googleChrome';
-    const checkIfUserExist: IAuthDocument | undefined = await getUserByUsernameOrEmail(username, email);
+    const checkIfUserExist: IAuthDocument | null = await getUserByEmail(email);
 
     if (checkIfUserExist) {
       throw new BadRequestError('Invalid credentials. Email or Username', 'Seed create() method error');
@@ -36,11 +36,10 @@ export async function create(req: Request, res: Response): Promise<void> {
     const randomBytes: Buffer = await Promise.resolve(crypto.randomBytes(20));
     const randomCharacters: string = randomBytes.toString('hex');
     const authData: IAuthDocument = {
-      username: firstLetterUppercase(username),
+      name: firstLetterUppercase(username),
       email: lowerCase(email),
       profilePublicId,
       password,
-      country,
       role,
       emailVerificationToken: randomCharacters,
       emailVerified: sample([0, 1]),

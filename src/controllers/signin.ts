@@ -1,8 +1,7 @@
 import { randomInt } from 'crypto';
 
-import { AuthModel } from '@auth/models/auth.schema';
 import { loginSchema } from '@auth/schemes/signin';
-import { getUserByEmail, getUserByUsername, signToken, updateUserOTP } from '@auth/services/auth.service';
+import { comparePassword, getUserByEmail, signToken, updateUserOTP } from '@auth/services/auth.service';
 import { BadRequestError, IAuthDocument, IEmailMessageDetails, isEmail } from '@hamzelotfalinezhad/shared-library';
 import { Request, Response } from 'express';
 import { StatusCodes } from 'http-status-codes';
@@ -18,15 +17,17 @@ export async function read(req: Request, res: Response): Promise<void> {
 
   const { username, password, browserName, deviceType } = req.body;
   const isValidEmail: boolean = isEmail(username);
+  if (!isValidEmail)  throw new BadRequestError('Invalid Email', 'SignIn read() method error');
 
   // check if user exist
-  const existingUser: IAuthDocument | undefined = !isValidEmail ? await getUserByUsername(username) : await getUserByEmail(username);
+  const existingUser: IAuthDocument | null = await getUserByEmail(username);
   if (!existingUser) {
     throw new BadRequestError('Invalid credentials', 'SignIn read() method error');
   }
 
   // check if password match
-  const passwordsMatch: boolean = await AuthModel.prototype.comparePassword(password, `${existingUser.password}`);
+  // const passwordsMatch: boolean = await AuthModel.prototype.comparePassword(password, `${existingUser.password}`);
+  const passwordsMatch: boolean = await comparePassword(password, `${existingUser.password}`);
   if (!passwordsMatch) {
     throw new BadRequestError('Invalid credentials', 'SignIn read() method error');
   }
@@ -49,7 +50,6 @@ export async function read(req: Request, res: Response): Promise<void> {
     // send email with otp
     const messageDetails: IEmailMessageDetails = {
       receiverEmail: 'hamze.t633@gmail.com', //existingUser.email,
-      username: existingUser.username,
       otp: `${otpCode}`,
       template: 'otpEmail'
     };
@@ -65,9 +65,9 @@ export async function read(req: Request, res: Response): Promise<void> {
     userDeviceType = `${existingUser.deviceType}`;
     const date: Date = new Date();
     date.setMinutes(date.getMinutes() + 10);
-    await updateUserOTP(existingUser.id!, `${otpCode}`, date, '', '');
+    await updateUserOTP(existingUser._id!, `${otpCode}`, date, '', '');
   } else {
-    userJWT = signToken(existingUser.id!, existingUser.email!, existingUser.username!, existingUser.name!, existingUser.role!);
+    userJWT = signToken(existingUser._id!, existingUser.email!, existingUser.name!, existingUser.role!);
     // userData = omit(existingUser, ['password']);
     userData = pick(existingUser, ['username', 'id', 'name', 'email']);
   }

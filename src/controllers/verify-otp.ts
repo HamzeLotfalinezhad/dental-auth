@@ -7,12 +7,12 @@ import { pick } from 'lodash';
 export async function updateOTP(req: Request, res: Response): Promise<void> {
   const { otp } = req.params;
   const { browserName, deviceType } = req.body;
-  const checkIfUserExist: IAuthDocument | undefined = await getAuthUserByOTP(otp);
+  const checkIfUserExist: IAuthDocument | null = await getAuthUserByOTP(otp);
   if (!checkIfUserExist) {
     throw new BadRequestError('OTP is invalid.', 'VerifyOTP updateOTP() method error');
   }
-  await updateUserOTP(checkIfUserExist.id!, '', new Date(), browserName, deviceType);
-  const userJWT = signToken(checkIfUserExist.id!, checkIfUserExist.email!, checkIfUserExist.username!, checkIfUserExist.name!, checkIfUserExist.role!);
+  await updateUserOTP(checkIfUserExist._id!, '', new Date(), browserName, deviceType);
+  const userJWT = signToken(checkIfUserExist._id!, checkIfUserExist.email!, checkIfUserExist.name!, checkIfUserExist.role!);
   // const userData = omit(checkIfUserExist, ['password']);
   const userData = pick(checkIfUserExist, ['username', 'id', 'email', 'name']);
   res.status(StatusCodes.OK).json({ message: 'OTP verified successfully.', user: userData, token: userJWT });

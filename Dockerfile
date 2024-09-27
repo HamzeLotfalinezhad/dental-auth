@@ -3,7 +3,13 @@ FROM node:22-alpine3.19 as builder
 WORKDIR /app
 COPY package*.json ./
 COPY tsconfig.json ./
+
+# Pass the environment variable
+# ARG NPM_TOKEN_SHARED_LIBRARY
+# ENV NPM_TOKEN_SHARED_LIBRARY=${NPM_TOKEN_SHARED_LIBRARY}
 COPY .npmrc ./
+# RUN echo ".npmrc content:" && cat .npmrc
+
 COPY src ./src
 RUN npm install -g npm@latest
 RUN npm ci && npm run build

@@ -10,7 +10,7 @@ import helmet from 'helmet';
 import cors from 'cors';
 import { verify } from 'jsonwebtoken';
 import compression from 'compression';
-import { checkConnection, createIndex } from '@auth/elasticsearch';
+import { checkConnection } from '@auth/elasticsearch';
 import { appRoutes } from '@auth/routes';
 import { Channel } from 'amqplib';
 import { createConnection } from '@auth/queues/connection';
@@ -70,7 +70,7 @@ async function startQueues(): Promise<void> {
 
 function startElasticSearch(): void {
   checkConnection();
-  createIndex('gigs');
+  // createIndex('gigs');
 }
 
 function authErrorHandler(app: Application): void {
@@ -81,7 +81,7 @@ function authErrorHandler(app: Application): void {
     console.log('Error prototype:', Object.getPrototypeOf(error));
     console.log('00000000000000000000000000000');
     console.log("instanceof CustomeError ", error instanceof CustomeError)
-    log.log('error', `AuthService ${error.comingFrom}:`, error); 
+    log.log('error', `AuthService ${error.comingFrom}:`, "error"); 
 
     if (error instanceof CustomeError) { 
       return res.status(error.statusCode).json(error.serializeErrors());
