@@ -4,6 +4,11 @@ WORKDIR /app
 COPY package.json ./
 COPY tsconfig.json ./
 COPY .npmrc ./
+# Pass the NPM_TOKEN_SHARED_LIBRARY as a build argument and environment variable
+ARG NPM_TOKEN_SHARED_LIBRARY
+ENV NPM_TOKEN_SHARED_LIBRARY=$NPM_TOKEN_SHARED_LIBRARY
+RUN echo "//npm.pkg.github.com/:_authToken=${NPM_TOKEN_SHARED_LIBRARY}" >> .npmrc
+
 COPY src ./src
 RUN ls -a
 RUN npm install && npm install -g nodemon
