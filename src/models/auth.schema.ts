@@ -3,23 +3,28 @@ import { Model, Schema, model } from 'mongoose';
 
 const authSchema: Schema = new Schema(
   {
-    name: { type: String, required: true },
-    email: { type: String, required: true, index: true, unique: true },
-    phone: { type: String, required: false, index: true, unique: true },
-    password: { type: String, required: true },
+    name: { type: String },
+    email: { type: String, index: true, unique: true },
+    phone: { type: String, required: true, index: true, unique: true },
+    // password: { type: String, required: true },
     role: { type: String, required: true, default: "user" },
 
-    emailVerified: { type: Number, default: 0 },
+    phoneVerified: { type: Boolean, default: false },
+    emailVerified: { type: Boolean, default: false },
     emailVerificationToken: { type: String, default: null },
+
     otp: { type: String, default: null },
     otpExpiration: { type: Date },
+
     passwordResetToken: { type: String },
     passwordResetExpires: { type: Date },
 
     browserName: { type: String, default: null },
     deviceType: { type: String, default: null },
 
-    createdAt: { type: Date },
+    status: { type: Boolean, default: false },
+
+    createdAt: { type: Date, default: Date.now },
     updatedAt: { type: Date }
   },
   {

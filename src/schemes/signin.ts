@@ -24,4 +24,14 @@ const loginSchema: ObjectSchema = Joi.object().keys({
   deviceType: Joi.string().optional()
 });
 
-export { loginSchema };
+
+const loginSchemaByPhone: ObjectSchema = Joi.object().keys({
+  phone: Joi.string().min(11).max(11).required().messages({
+    'string.base': 'Phone must be of type string',
+    'string.min': 'Invalid Phone',
+    'string.max': 'Invalid Phone',
+    'string.empty': 'Phone is a required field'
+  })
+});
+
+export { loginSchema, loginSchemaByPhone };

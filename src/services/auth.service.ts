@@ -46,6 +46,7 @@ export async function getAuthUserByPasswordToken(token: string): Promise<IAuthDo
 export async function getAuthUserByOTP(otp: string): Promise<IAuthDocument | null> {
   const result: IAuthDocument | null = await AuthModel.findOne(
     {
+      // otp: otp
       $and: [{
         otp: otp
       }, {
@@ -61,16 +62,9 @@ export async function updateVerifyEmailField(id: string | ObjectId, emailVerifie
     const updateFields = !emailVerificationToken ?
       { emailVerified } :
       { emailVerified, emailVerificationToken };
-    const result = await AuthModel.updateOne({ _id: id }, updateFields);
-    console.log(result)
-    // if (result.nModified > 0) {
-    //   return true
-    // }else{
-    //   return false
-    // }
+    await AuthModel.updateOne({ _id: id }, updateFields);
   } catch (error) {
     console.log(error)
-    // return false
   }
 }
 
@@ -131,6 +125,17 @@ export async function updateRole(id: Number, email: string, role: String): Promi
   }
 }
 
+export async function updatePhoneVerifiedAndStatus(id: String): Promise<void> {
+  try {
+    await AuthModel.updateOne(
+      { _id: id },
+      { phoneVerified: true, status: true }
+    );
+  } catch (error) {
+    console.error('Update failed:', error);
+  }
+}
+
 export function signToken(id: string | ObjectId, email: string, name: string, role: String): string {
   return sign(
     {
@@ -165,9 +170,20 @@ export async function comparePassword(plainPassword: string, hashedPassword: str
 }
 
 export function validatePasswords(password: string, repeatedPassword: string) {
-  if (password === repeatedPassword) {
-    return true; // Passwords match
-  } else {
-    return false; // Passwords do not match
-  }
+  if (password === repeatedPassword) return true;
+  return false;
+}
+
+export async function isPhoneExist(phone: string): Promise<IAuthDocument | null> {
+  const result: IAuthDocument | null = await AuthModel.findOne(
+    {
+      phone: phone
+      // $and: [{
+      //   phone: phone
+      // }, {
+      //   phoneVerified: true
+      // }]
+    },
+  );
+  return result;
 }
